@@ -1,0 +1,6 @@
+{
+  "deviceId": "esp32-water",
+  "hardwareStatus": "PENDING_HARDWARE_VALIDATION",
+  "sources": ["src/PumpSafety.cpp", "src/SoilReading.cpp", "src/IrrigationController.cpp", "src/WaterRuntime.cpp", "tests/main.cpp", "tests/controllers.cpp"],
+  "include": "include"
+}

@@ -1,0 +1,27 @@
+ets Jul 29 2019 12:21:46
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:1184
+load:0x40078000,len:13232
+load:0x40080400,len:3028
+entry 0x400805e4
+CIDADE_VIVA_ENERGY_LED26_TEST v1
+deviceId=esp32-energy externalOutputs=BENCH_LED26_ONLY
+BENCH_ONLY: red LED with series 220 ohm resistor to GND; no other application GPIO.
+No WiFi/MQTT or sensors; GPIO request is not measured light.
+LED26_REQUEST uptimeMs=27 gpio=26 level=LOW physicalFeedback=NONE
+LED26_REQUEST uptimeMs=515 gpio=26 level=HIGH physicalFeedback=NONE
+LED26_REQUEST uptimeMs=1015 gpio=26 level=LOW physicalFeedback=NONE
+LED26_REQUEST uptimeMs=1515 gpio=26 level=HIGH physicalFeedback=NONE
+LED26_REQUEST uptimeMs=2015 gpio=26 level=LOW physicalFeedback=NONE
+LED26_REQUEST uptimeMs=2515 gpio=26 level=HIGH physicalFeedback=NONE
+LED26_REQUEST uptimeMs=3015 gpio=26 level=LOW physicalFeedback=NONE
+LED26_REQUEST uptimeMs=3515 gpio=26 level=HIGH physicalFeedback=NONE
+LED26_REQUEST uptimeMs=4015 gpio=26 level=LOW physicalFeedback=NONE
+LED26_REQUEST uptimeMs=4515 gpio=26 level=HIGH physicalFeedback=NONE
+LED26_REQUEST uptimeMs=5015 gpio=26 level=LOW physicalFeedback=NONE
+LED26_REQUEST uptimeMs=5515 gpio=26 level=HIGH physicalFeedback=NONE
+LED26_REQUEST uptimeMs=6015 gpio=26 level=LOW physicalFeedback=NONE
+CAPTURE_RESULT profile=led26 boot_marker=True messages=13 profile_status_ok=True

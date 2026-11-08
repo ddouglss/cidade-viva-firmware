@@ -1,0 +1,151 @@
+clang version 22.1.7 (https://github.com/llvm/llvm-project.git a255c1ed36a1d06f79bd2633ba9f8d900153007c)
+Target: x86_64-w64-windows-gnu
+Thread model: posix
+InstalledDir: [USERPROFILE compiler]
+Configuration file: [USERPROFILE compiler]
+TEST APP: esp32-energy (PENDING_HARDWARE_VALIDATION)
+PASS: boot logical all red and loads OFF
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: recreated boot has no green conflict
+PASS: light missing config refuses AUTO
+PASS: light invalid thresholds refuse AUTO
+PASS: light NaN configuration rejected
+PASS: light MANUAL explicit ON
+PASS: light MANUAL independent of lux sensor
+PASS: light AUTO entry applies configured fallback
+PASS: light darkness waits stability
+PASS: light darkness stable boundary ON
+PASS: light equality and hysteresis hold ON
+PASS: light interrupted candidate restarts stability
+PASS: light high stable boundary OFF
+PASS: light infinity faults and cancels candidate
+PASS: light recovery needs new stable window
+PASS: light valid recovery ON
+PASS: light stale reading applies fallback
+PASS: light caller-selected ON or HOLD fallback
+PASS: light caller-selected ON or HOLD fallback
+PASS: light stability across uint32 wrap
+PASS: light mode returns explicit manual control
+PASS: traffic absent config stays all red
+PASS: traffic zero phase duration rejected
+PASS: traffic exact safe sequence and coalesced crossing
+PASS: traffic vehicles RED during walk and clearance
+PASS: traffic three full cycles without conflicting greens
+PASS: traffic delayed tick never skips safety phase
+PASS: traffic same tick cannot collapse next phase
+PASS: traffic wrap before boundary
+PASS: traffic wrap at phase boundary
+PASS: traffic reboot clears pending and starts RED
+PASS: traffic fresh boot safe during every phase including pedestrian transition
+PASS: traffic invariant over 20000 deterministic delayed updates
+PASS: traffic buzzer requires explicit enabled policy
+PASS: button held at boot emits no request
+PASS: button bounce filtered and hold emits once
+PASS: button debounced release rearms
+PASS: button missing debounce disabled
+PASS: button debounce across uint32 wrap
+PASS: energy runtime applies boot before first input
+PASS: energy runtime routes sensor to light output
+PASS: energy runtime advances local traffic without network
+PASS: energy runtime applies manual OFF immediately
+PASS: energy runtime absent parameters stays conservative
+PASS: disabled adapter exposes absent sensor and button without fabricated data
+PASS: disabled firmware runtime boots MANUAL OFF and logical ALL_RED
+PASS: disabled firmware absent calibration prevents automatic light or traffic start
+PASS: logical requests never enable external outputs in disabled adapter
+PASS: bench LED starts LOW until diagnostic interval
+PASS: bench LED HIGH at 500ms boundary
+PASS: bench LED LOW on next interval
+PASS: bench LED delayed tick advances once without busy loop
+PASS: bench LED timer handles uint32 wrap
+TEST APP: esp32-water (PENDING_HARDWARE_VALIDATION)
+PASS: boot OFF
+PASS: low blocks request
+PASS: unknown blocks request
+PASS: invalid duration stays OFF
+PASS: valid local pulse starts
+PASS: busy request cannot extend pulse
+PASS: pulse active before boundary
+PASS: duration boundary OFF
+PASS: cooldown before boundary
+PASS: cooldown recovers at boundary
+PASS: low interrupts running pulse
+PASS: water return does not bypass cooldown
+PASS: water recovery never auto starts
+PASS: unknown interrupts running pulse
+PASS: maximum before boundary
+PASS: maximum boundary timeout OFF
+PASS: timeout does not recover with time
+PASS: late evaluation detects local maximum
+PASS: new instance after reset OFF
+PASS: wrap pulse before boundary
+PASS: wrap pulse end
+PASS: wrap cooldown recovery
+PASS: wrap timeout
+PASS: invalid config OFF
+PASS: ambiguous temporal range blocked
+PASS: soil uncalibrated keeps raw without percentage
+PASS: soil absent sensor never interpreted as dry
+PASS: soil relative calibration endpoints and midpoint
+PASS: soil opposite calibration polarity supported
+PASS: soil outside calibrated interval rejected without clamping
+PASS: soil degenerate and out-of-range calibration rejected
+PASS: soil simulation explicitly distinct from physical ADC
+PASS: soil sample age exact boundary
+PASS: soil NaN infinity and invalid percentages rejected
+PASS: soil future time and absent age policy cannot drive AUTO
+PASS: soil freshness across uint32 wrap
+PASS: irrigation missing config blocks AUTO
+PASS: irrigation AUTO pulse must stay below safety maximum
+PASS: irrigation NaN threshold refused
+PASS: irrigation boot manual and OFF
+PASS: irrigation uncalibrated physical input inhibits AUTO
+PASS: irrigation threshold equality does not mean dry
+PASS: irrigation labeled dry simulation starts local AUTO
+PASS: irrigation manual request cannot bypass AUTO mode
+PASS: irrigation accepted pulse remains bounded despite wet reading
+PASS: irrigation AUTO pulse ends at configured duration
+PASS: irrigation dry cannot bypass cooldown
+PASS: irrigation fresh dry decision after cooldown
+PASS: irrigation AUTO low reservoir overrides sensor
+PASS: irrigation wet recovery cannot restart pump
+PASS: irrigation invalid input stops running AUTO
+PASS: irrigation stale dry input cannot restart
+PASS: irrigation calibrated physical dry input starts AUTO
+PASS: irrigation mode change OFF preserves cooldown
+PASS: irrigation manual recovers only after cooldown
+PASS: irrigation same mode does not cancel and manual does not require soil
+PASS: irrigation manual duration still enforced without soil
+PASS: irrigation mode switch cannot clear timeout latch
+PASS: irrigation unknown float blocks otherwise valid AUTO
+PASS: irrigation AUTO across uint32 wrap
+PASS: local repeated OFF does not extend cooldown
+PASS: irrigation late mode change cannot hide elapsed timeout
+PASS: irrigation reading becoming stale interrupts active AUTO pulse
+PASS: unrecognized internal float state fails closed
+PASS: water runtime OFF before sensor read and MANUAL skips soil
+PASS: water runtime applies accepted manual pulse
+PASS: water runtime unknown float applies OFF
+PASS: water runtime fresh simulated AUTO drives fake output
+PASS: water runtime applies low-water OFF before soil acquisition
+PASS: water runtime rechecks float after soil before starting pulse
+PASS: water runtime new boot applies OFF with no automatic restart
+PASS: water disabled hardware never invents water present or humidity
+PASS: water disabled runtime boots OFF and unknown float blocks control
+PASS: water disabled runtime refuses manual pulse with absent float
+PASS: water disabled profile refuses AUTO without configuration
+PASS: water disabled driver cannot enable external pump output
+PASS: float bench starts SETTLING rather than guessing water
+PASS: float bench waits full diagnostic debounce
+PASS: float bench stable open contact at boundary
+PASS: float bench bouncing contact resets debounce
+PASS: float bench reports stable closed without level mapping
+PASS: float bench debounce across uint32 wrap

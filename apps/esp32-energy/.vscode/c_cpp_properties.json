@@ -1,0 +1,17 @@
+{
+  "configurations": [
+    {
+      "name": "Windows host C++17",
+      "compilerPath": "${env:USERPROFILE}/.cidade-viva/toolchains/llvm-mingw-20260602-ucrt-x86_64/bin/clang++.exe",
+      "intelliSenseMode": "windows-clang-x64",
+      "cppStandard": "c++17",
+      "cStandard": "c17",
+      "includePath": [
+        "${workspaceFolder}/include"
+      ],
+      "defines": [],
+      "compileCommands": "${workspaceFolder}/compile_commands.json"
+    }
+  ],
+  "version": 4
+}

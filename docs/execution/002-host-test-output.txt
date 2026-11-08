@@ -1,0 +1,43 @@
+clang version 22.1.7 (https://github.com/llvm/llvm-project.git a255c1ed36a1d06f79bd2633ba9f8d900153007c)
+Target: x86_64-w64-windows-gnu
+Thread model: posix
+InstalledDir: [local portable toolchain]
+Configuration file: [local portable toolchain]
+TEST APP: esp32-energy (PENDING_HARDWARE_VALIDATION)
+PASS: boot logical all red and loads OFF
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: green invariant matrix
+PASS: recreated boot has no green conflict
+TEST APP: esp32-water (PENDING_HARDWARE_VALIDATION)
+PASS: boot OFF
+PASS: low blocks request
+PASS: unknown blocks request
+PASS: invalid duration stays OFF
+PASS: valid local pulse starts
+PASS: busy request cannot extend pulse
+PASS: pulse active before boundary
+PASS: duration boundary OFF
+PASS: cooldown before boundary
+PASS: cooldown recovers at boundary
+PASS: low interrupts running pulse
+PASS: water return does not bypass cooldown
+PASS: water recovery never auto starts
+PASS: unknown interrupts running pulse
+PASS: maximum before boundary
+PASS: maximum boundary timeout OFF
+PASS: timeout does not recover with time
+PASS: late evaluation detects local maximum
+PASS: new instance after reset OFF
+PASS: wrap pulse before boundary
+PASS: wrap pulse end
+PASS: wrap cooldown recovery
+PASS: wrap timeout
+PASS: invalid config OFF
+PASS: ambiguous temporal range blocked

@@ -1,0 +1,21 @@
+ets Jul 29 2019 12:21:46
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:1184
+load:0x40078000,len:13232
+load:0x40080400,len:3028
+entry 0x400805e4
+CIDADE_VIVA_WATER v0.2.0-pump-disabled
+deviceId=esp32-water floatInput=G27 soilInput=G34 pumpOutput=DISABLED
+Float indication: stable CLOSED=PRESENT, OPEN=LOW, closing=UNKNOWN.
+Installation=PENDING_VALIDATION pumpCircuit=PENDING_VALIDATION calibration=NONE
+No pump GPIO, WiFi/MQTT or AUTO commands configured.
+WATER_STATUS uptimeMs=1000 reservoir=LOW state=BLOCKED_LOW_WATER mode=MANUAL pumpRequested=OFF pumpOutput=DISABLED soilRaw=900 unit=ADC_COUNT origin=PHYSICAL_SENSOR calibration=NONE humidityPct=UNAVAILABLE
+WATER_STATUS uptimeMs=2000 reservoir=LOW state=BLOCKED_LOW_WATER mode=MANUAL pumpRequested=OFF pumpOutput=DISABLED soilRaw=446 unit=ADC_COUNT origin=PHYSICAL_SENSOR calibration=NONE humidityPct=UNAVAILABLE
+WATER_STATUS uptimeMs=3000 reservoir=LOW state=BLOCKED_LOW_WATER mode=MANUAL pumpRequested=OFF pumpOutput=DISABLED soilRaw=474 unit=ADC_COUNT origin=PHYSICAL_SENSOR calibration=NONE humidityPct=UNAVAILABLE
+WATER_STATUS uptimeMs=4000 reservoir=LOW state=BLOCKED_LOW_WATER mode=MANUAL pumpRequested=OFF pumpOutput=DISABLED soilRaw=523 unit=ADC_COUNT origin=PHYSICAL_SENSOR calibration=NONE humidityPct=UNAVAILABLE
+WATER_STATUS uptimeMs=5000 reservoir=LOW state=BLOCKED_LOW_WATER mode=MANUAL pumpRequested=OFF pumpOutput=DISABLED soilRaw=560 unit=ADC_COUNT origin=PHYSICAL_SENSOR calibration=NONE humidityPct=UNAVAILABLE
+WATER_STATUS uptimeMs=6000 reservoir=LOW state=BLOCKED_LOW_WATER mode=MANUAL pumpRequested=OFF pumpOutput=DISABLED soilRaw=694 unit=ADC_COUNT origin=PHYSICAL_SENSOR calibration=NONE humidityPct=UNAVAILABLE
+CAPTURE_RESULT profile=water-monitor boot_marker=True messages=6 profile_status_ok=True

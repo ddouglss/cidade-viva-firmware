@@ -1,0 +1,6 @@
+{
+  "deviceId": "esp32-energy",
+  "hardwareStatus": "PENDING_HARDWARE_VALIDATION",
+  "sources": ["src/EnergySafety.cpp", "src/LightController.cpp", "src/TrafficController.cpp", "src/EnergyRuntime.cpp", "tests/main.cpp", "tests/controllers.cpp"],
+  "include": "include"
+}

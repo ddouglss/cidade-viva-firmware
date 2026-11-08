@@ -1,0 +1,26 @@
+ets Jul 29 2019 12:21:46
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:1184
+load:0x40078000,len:13232
+load:0x40080400,len:3028
+entry 0x400805e4
+CIDADE_VIVA_USB_SMOKE v1
+DIAGNOSTIC_ONLY: external actuators and sensors NOT configured
+chip=ESP32-D0WD-V3 revision=3 cpuMHz=240 flashBytes=4194304
+No WiFi/MQTT; no application GPIO configured.
+USB_SMOKE_ALIVE uptimeMs=1000
+USB_SMOKE_ALIVE uptimeMs=2000
+USB_SMOKE_ALIVE uptimeMs=3000
+USB_SMOKE_ALIVE uptimeMs=4000
+USB_SMOKE_ALIVE uptimeMs=5000
+USB_SMOKE_ALIVE uptimeMs=6000
+USB_SMOKE_ALIVE uptimeMs=7000
+USB_SMOKE_ALIVE uptimeMs=8000
+USB_SMOKE_ALIVE uptimeMs=9000
+USB_SMOKE_ALIVE uptimeMs=10000
+USB_SMOKE_ALIVE uptimeMs=11000
+USB_SMOKE_ALIVE uptimeMs=12000
+CAPTURE_RESULT boot_marker=True heartbeats=12
