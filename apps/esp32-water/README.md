@@ -120,3 +120,25 @@ Na raiz firmware:
 Perfil padrão ainda é water-disabled. Habilitar potência exige especificar e
 validar fonte/corrente, acionamento/proteção do motor e GPIO real antes de trocar
 o DisabledPumpDriver. Nenhuma confirmação de vazão é inferida do software.
+
+## Teste de bancada Wi-Fi
+
+Conecte somente a unidade da água por USB e confirme a porta. Os comandos
+abaixo partem da raiz do firmware e usam COM5 como exemplo. Feche o monitor
+serial antes de rodar o teste.
+
+```powershell
+./tools/pio.ps1 run --project-dir apps/esp32-water -e water-wifi-test -t upload --upload-port COM5
+& "$env:USERPROFILE/.platformio/penv/Scripts/python.exe" ./tools/test-water-wifi.py --port COM5
+```
+
+Informe o SSID de 2,4 GHz e digite a senha no prompt oculto. O script envia os
+dados pelo USB. A placa guarda a configuração Wi-Fi em RAM. O reset inicia uma
+nova tentativa com novo envio das credenciais.
+
+O resultado esperado é `ESP32 conectado ao Wi-Fi. IP: ...`. Execute o comando
+`ping` mostrado pelo script para testar o alcance a partir do notebook. O
+perfil continua monitorando boia e ADC bruto com bomba desabilitada.
+
+Veja o escopo e o estado da validação em
+[SDD 011](../../docs/sdd/011-water-wifi-test/spec.md).

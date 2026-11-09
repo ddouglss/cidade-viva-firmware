@@ -2,6 +2,13 @@
 #include "DisabledWaterHardware.hpp"
 #include "FloatSafetyInput.hpp"
 
+#ifdef CIDADE_VIVA_WIFI_TEST
+#include <Preferences.h>
+#include <WebServer.h>
+#include <WiFi.h> // Lets PlatformIO discover WiFi for the shared bench header.
+#include "../../../tools/esp32-smoke/WifiBench.hpp"
+#endif
+
 namespace {
 constexpr int floatGpio = 27;
 constexpr int soilGpio = 34;
@@ -65,12 +72,19 @@ void setup() {
     Serial.println("deviceId=esp32-water floatInput=G27 soilInput=G34 pumpOutput=DISABLED");
     Serial.println("Float indication: stable CLOSED=PRESENT, OPEN=LOW, closing=UNKNOWN.");
     Serial.println("Installation=PENDING_VALIDATION pumpCircuit=PENDING_VALIDATION calibration=NONE");
+#ifdef CIDADE_VIVA_WIFI_TEST
+    Serial.println("WiFi station test. Pump output disabled.");
+#else
     Serial.println("No pump GPIO, WiFi/MQTT or AUTO commands configured.");
+#endif
 }
 
 void loop() {
     runtime.tick();
     const auto now = clockSource.nowMs();
+#ifdef CIDADE_VIVA_WIFI_TEST
+    tickWifiTest(now, "esp32-water");
+#endif
     if (std::uint32_t(now - lastLogAt) >= 1000u) {
         lastLogAt = now;
         const auto reading = soilSensor.read();

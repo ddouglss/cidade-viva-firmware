@@ -76,3 +76,19 @@ explícitos, na raiz firmware:
 Para parar o teste, desconectar USB; para voltar à imagem sem GPIO, gravar o
 ambiente energy-disabled conforme comando anterior. A serial reporta pedido de
 nível, não medição de luz. Arquivo de entrada: firmware/led26_main.cpp.
+
+## Teste de bancada Wi-Fi
+
+O perfil `energy-wifi-test` mantém as saídas de aplicação desabilitadas e
+aguarda o SSID e a senha pelo USB. Na raiz do repositório, com a unidade
+de energia na COM5 e o monitor serial fechado, execute:
+
+```powershell
+./tools/pio.ps1 run --project-dir apps/esp32-energy -e energy-wifi-test -t upload --upload-port COM5
+& "$env:USERPROFILE/.platformio/penv/Scripts/python.exe" ./tools/test-water-wifi.py --port COM5
+```
+
+O script também atende a unidade de energia. Digite a senha no prompt
+oculto e confira o IP mostrado após a associação. Reiniciar a placa
+descarta as credenciais e permite um novo teste. Detalhes e evidências na
+[SDD de bancada](../../docs/sdd/011-water-wifi-test/spec.md).
