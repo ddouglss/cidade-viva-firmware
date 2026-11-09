@@ -1,0 +1,27 @@
+name: Firmware host CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  host:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        app: [esp32-energy, esp32-water]
+    steps:
+      - uses: actions/checkout@v5
+      - name: Compile and run host tests
+        working-directory: apps/${{ matrix.app }}
+        run: |
+          mapfile -t sources < <(jq -r '.sources[]' host.json)
+          include="$(jq -r '.include' host.json)"
+          g++ -std=c++17 -Wall -Wextra -Wpedantic -Werror -O2 -I "$include" "${sources[@]}" -o /tmp/cidade-viva-tests
+          /tmp/cidade-viva-tests
