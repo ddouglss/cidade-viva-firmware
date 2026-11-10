@@ -4,19 +4,21 @@
 #include <MQTT.h>
 #include <Preferences.h>
 #include <WiFi.h>
+#include <WebServer.h>
 #include <time.h>
 
 // Telemetry-only bench transport. No command subscription or physical output.
 class PrivateMqttTelemetry {
 public:
     PrivateMqttTelemetry(const char* deviceId, const char* version, const char* mode)
-        : deviceId_(deviceId), version_(version), mode_(mode), mqtt_(512) {}
+        : deviceId_(deviceId), version_(version), mode_(mode), mqtt_(512), http_(80) {}
 
     void begin() {
         bootId_ = esp_random();
         Serial.begin(115200);
         Serial.printf("CV_MQTT_READY deviceId=%s outputs=DISABLED\n", deviceId_);
         loadConfig();
+        loadApPassword();
         WiFi.persistent(false);
         WiFi.mode(WIFI_STA);
         mqtt_.setOptions(15, true, 1000);
@@ -28,12 +30,18 @@ public:
     void tick(uint32_t now, const String& measurements, const String& actuators,
               const char* origin, bool valid) {
         readSerial();
+        if (apActive_) http_.handleClient();
+        if (pendingWifi_ && uint32_t(now - pendingAt_) >= 1000u) applyPendingWifi();
         if (!configured_) return;
         if (WiFi.status() != WL_CONNECTED) {
             ntpStarted_ = false;
+            if (wifiLostAt_ == 0) wifiLostAt_ = now;
+            if (uint32_t(now - wifiLostAt_) >= 30000u) startAp();
             if (uint32_t(now - lastWifiAttempt_) >= 10000u) startWifi();
             return;
         }
+        wifiLostAt_ = 0;
+        if (apActive_) stopAp();
         if (!ntpStarted_) { configTime(0, 0, "pool.ntp.org"); ntpStarted_ = true; }
         if (!mqtt_.connected()) {
             if (uint32_t(now - lastMqttAttempt_) < 5000u) return;
@@ -69,6 +77,7 @@ private:
     const char* mode_;
     WiFiClient net_;
     MQTTClient mqtt_;
+    WebServer http_;
     char ssid_[33] = {};
     char wifiPassword_[64] = {};
     char host_[48] = {};
@@ -82,9 +91,18 @@ private:
     uint32_t lastMqttAttempt_ = 0;
     uint32_t lastStatusAt_ = 0;
     uint32_t lastTelemetryAt_ = 0;
+    uint32_t wifiLostAt_ = 0;
+    uint32_t pendingAt_ = 0;
+    bool apActive_ = false;
+    bool pendingWifi_ = false;
+    char apPassword_[17] = {};
+    String pendingSsid_;
+    String pendingPassword_;
+    String pendingHost_;
     String serialLine_;
     String fields_[5];
     int fieldCount_ = -1;
+    bool rotation_ = false;
 
     String statusTopic() const { return String("cidade-viva/v1/") + deviceId_ + "/status"; }
     String telemetryTopic() const { return String("cidade-viva/v1/") + deviceId_ + "/telemetry"; }
@@ -127,6 +145,86 @@ private:
         Serial.println("CV_WIFI_CONNECTING");
     }
 
+    void loadApPassword() {
+        Preferences prefs;
+        if (!prefs.begin("cv-network", false)) return;
+        String value = prefs.getString("apPass", "");
+        if (value.length() != 16) {
+            char generated[17];
+            snprintf(generated, sizeof generated, "%08lx%08lx",
+                     (unsigned long)esp_random(), (unsigned long)esp_random());
+            value = generated;
+            prefs.putString("apPass", value);
+        }
+        prefs.end();
+        value.toCharArray(apPassword_, sizeof apPassword_);
+        Serial.printf("CV_AP_PASSWORD=%s\n", apPassword_);
+    }
+
+    void startAp() {
+        if (apActive_ || !configured_ || strlen(apPassword_) < 8) return;
+        WiFi.mode(WIFI_AP_STA);
+        String apName = String("CidadeViva-") + (String(deviceId_) == "esp32-water" ? "Water" : "Energy");
+        if (!WiFi.softAP(apName.c_str(), apPassword_)) return;
+        http_.on("/", HTTP_GET, [this]() {
+            http_.send(200, "text/html; charset=utf-8",
+                "<!doctype html><html lang='pt-br'><meta name='viewport' content='width=device-width,initial-scale=1'>"
+                "<title>Cidade Viva - Wi-Fi</title><body><h1>Configurar Wi-Fi da placa</h1>"
+                "<p>Informe a rede 2,4 GHz e o IPv4 privado do notebook que executa a ponte MQTT.</p>"
+                "<form method='post' action='/configure'>"
+                "<label>Rede (SSID) <input name='ssid' maxlength='32' required></label><br>"
+                "<label>Senha Wi-Fi <input name='password' type='password' maxlength='63'></label><br>"
+                "<label>IP da ponte <input name='host' inputmode='decimal' required></label><br>"
+                "<button type='submit'>Salvar e conectar</button></form></body></html>");
+        });
+        http_.on("/configure", HTTP_POST, [this]() {
+            String ssid = http_.arg("ssid");
+            String password = http_.arg("password");
+            String host = http_.arg("host");
+            if (ssid.length() < 1 || ssid.length() > 32
+                || (password.length() != 0 && (password.length() < 8 || password.length() > 63))
+                || host.length() < 7 || host.length() >= sizeof host_
+                || !privateIpv4(host.c_str())) {
+                http_.send(400, "text/plain; charset=utf-8", "Dados invalidos. Verifique SSID, senha e IP privado.");
+                return;
+            }
+            pendingSsid_ = ssid;
+            pendingPassword_ = password;
+            pendingHost_ = host;
+            pendingAt_ = millis();
+            pendingWifi_ = true;
+            http_.send(200, "text/html; charset=utf-8",
+                "<h1>Configuracao recebida</h1><p>A placa tentara conectar. Volte ao painel Cidade Viva para verificar o status.</p>");
+        });
+        http_.begin();
+        apActive_ = true;
+        Serial.printf("CV_AP_READY ssid=%s ip=%s\n", apName.c_str(), WiFi.softAPIP().toString().c_str());
+    }
+
+    void stopAp() {
+        http_.stop();
+        WiFi.softAPdisconnect(true);
+        WiFi.mode(WIFI_STA);
+        apActive_ = false;
+    }
+
+    void applyPendingWifi() {
+        pendingWifi_ = false;
+        Preferences prefs;
+        if (!prefs.begin("cv-network", false)) return;
+        prefs.putString("ssid", pendingSsid_);
+        prefs.putString("wifiPass", pendingPassword_);
+        prefs.putString("host", pendingHost_);
+        prefs.end();
+        pendingSsid_ = pendingPassword_ = pendingHost_ = "";
+        loadConfig();
+        mqtt_.disconnect();
+        mqtt_.setHost(host_, 1883);
+        WiFi.disconnect();
+        wifiLostAt_ = millis();
+        startWifi();
+    }
+
     void readSerial() {
         for (int i = 0; i < 96 && Serial.available(); ++i) {
             char c = char(Serial.read());
@@ -138,29 +236,41 @@ private:
             }
             String line = serialLine_;
             serialLine_ = "";
-            if (line == "CVNET1") { fieldCount_ = 0; continue; }
+            if (line == "CVNET1" || line == "CVMQTT1") {
+                rotation_ = line == "CVMQTT1";
+                fieldCount_ = 0;
+                continue;
+            }
             if (fieldCount_ < 0) continue;
             fields_[fieldCount_++] = line;
-            if (fieldCount_ != 5) continue;
+            if (fieldCount_ != (rotation_ ? 3 : 5)) continue;
             fieldCount_ = -1;
             char ssid[33], wifiPass[64], host[48], user[33], mqttPass[65];
-            bool valid = copyField(ssid, sizeof ssid, fields_[0])
-                && fields_[1].length() < sizeof wifiPass
-                && copyField(host, sizeof host, fields_[2]) && privateIpv4(host)
-                && copyField(user, sizeof user, fields_[3])
-                && copyField(mqttPass, sizeof mqttPass, fields_[4]);
+            const int offset = rotation_ ? 0 : 2;
+            bool valid = (!rotation_ || configured_)
+                && (rotation_ || (copyField(ssid, sizeof ssid, fields_[0])
+                    && fields_[1].length() < sizeof wifiPass))
+                && copyField(host, sizeof host, fields_[offset]) && privateIpv4(host)
+                && copyField(user, sizeof user, fields_[offset + 1])
+                && copyField(mqttPass, sizeof mqttPass, fields_[offset + 2]);
             if (!valid) { Serial.println("CV_MQTT_CONFIG_INVALID"); continue; }
             Preferences prefs;
             if (!prefs.begin("cv-network", false)) { Serial.println("CV_MQTT_CONFIG_FAILED"); continue; }
-            prefs.putString("ssid", fields_[0]);
-            prefs.putString("wifiPass", fields_[1]);
-            prefs.putString("host", fields_[2]);
-            prefs.putString("user", fields_[3]);
-            prefs.putString("mqttPass", fields_[4]);
+            if (!rotation_) {
+                prefs.putString("ssid", fields_[0]);
+                prefs.putString("wifiPass", fields_[1]);
+            }
+            prefs.putString("host", fields_[offset]);
+            prefs.putString("user", fields_[offset + 1]);
+            prefs.putString("mqttPass", fields_[offset + 2]);
             prefs.end();
             for (auto& field : fields_) field = "";
             loadConfig();
-            if (configured_) { mqtt_.setHost(host_, 1883); startWifi(); }
+            if (configured_) {
+                mqtt_.disconnect();
+                mqtt_.setHost(host_, 1883);
+                if (!rotation_) startWifi();
+            }
         }
     }
 
