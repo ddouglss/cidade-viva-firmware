@@ -1,5 +1,6 @@
 .build/
 .pio/
+__pycache__/
 compile_commands.json
 .env
 .env.*
