@@ -1,7 +1,7 @@
 param(
     [string]$Port = 'COM5',
     [ValidateSet('esp32-energy', 'esp32-water')][string]$DeviceId = 'esp32-energy',
-    [string]$BrokerIp = '192.168.1.5'
+    [string]$BrokerIp = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -9,6 +9,12 @@ $root = Split-Path -Parent $PSScriptRoot
 $python = Join-Path $env:USERPROFILE '.platformio/penv/Scripts/python.exe'
 $secretPath = Join-Path $env:USERPROFILE "AppData/Roaming/CidadeViva/mqtt-$($DeviceId.Substring(6)).dpapi"
 if (-not (Test-Path -LiteralPath $python)) { throw 'Python do PlatformIO nao encontrado.' }
+if (-not $BrokerIp) {
+    $BrokerIp = (Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias 'Wi-Fi' |
+        Where-Object { $_.IPAddress -match '^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)' } |
+        Select-Object -First 1).IPAddress
+}
+if (-not $BrokerIp) { throw 'Conecte este PC ao hotspot antes de configurar a placa.' }
 
 Write-Host "Configure $DeviceId com o Wi-Fi 2.4 GHz usado neste PC."
 $env:CV_WIFI_SSID = Read-Host 'Nome exato da rede (SSID)'

@@ -46,7 +46,8 @@ public:
             String will = statusPayload(false, now);
             mqtt_.setWill(statusTopic().c_str(), will.c_str(), true, 1);
             if (!mqtt_.connect(deviceId_, user_, mqttPassword_)) {
-                Serial.println("CV_MQTT_DISCONNECTED");
+                Serial.printf("CV_MQTT_DISCONNECTED error=%d returnCode=%d\n",
+                    int(mqtt_.lastError()), int(mqtt_.returnCode()));
                 return;
             }
             Serial.println("CV_MQTT_CONNECTED");
@@ -184,6 +185,10 @@ private:
         String apName = String("CidadeViva-") + (String(deviceId_) == "esp32-water" ? "Water" : "Energy");
         if (!WiFi.softAP(apName.c_str(), apPassword_)) return;
         http_.on("/", HTTP_GET, [this]() {
+            if (http_.client().localIP() != WiFi.softAPIP()) {
+                http_.send(403, "text/plain", "Use a rede de configuracao da placa.");
+                return;
+            }
             http_.send(200, "text/html; charset=utf-8",
                 "<!doctype html><html lang='pt-br'><meta name='viewport' content='width=device-width,initial-scale=1'>"
                 "<title>Cidade Viva - Wi-Fi</title><body><h1>Configurar Wi-Fi da placa</h1>"
@@ -195,6 +200,10 @@ private:
                 "<button type='submit'>Salvar e conectar</button></form></body></html>");
         });
         http_.on("/configure", HTTP_POST, [this]() {
+            if (http_.client().localIP() != WiFi.softAPIP()) {
+                http_.send(403, "text/plain", "Use a rede de configuracao da placa.");
+                return;
+            }
             String ssid = http_.arg("ssid");
             String password = http_.arg("password");
             String host = http_.arg("host");
@@ -245,6 +254,12 @@ private:
             }
             String line = serialLine_;
             serialLine_ = "";
+            if (line == "CVINFO") {
+                Serial.printf("CV_NETWORK mode=%d staConnected=%d apIp=%s apSsid=%s channel=%d\n",
+                    int(WiFi.getMode()), WiFi.status() == WL_CONNECTED,
+                    WiFi.softAPIP().toString().c_str(), WiFi.softAPSSID().c_str(), WiFi.channel());
+                continue;
+            }
             if (line == "CVNET1" || line == "CVMQTT1") {
                 rotation_ = line == "CVMQTT1";
                 fieldCount_ = 0;
