@@ -2,6 +2,6 @@
 
 - [x] T012-01 Implementar perfil de telemetria independente para cada placa, sem saídas físicas. Evidência: builds PlatformIO `energy-telemetry` e `water-telemetry`.
 - [x] T012-02 Compilar ambos os perfis e validar payloads representativos contra o parser do backend. Evidência: 46 testes .NET passaram; execução MQTT real ainda depende de T012-04/05.
-- [ ] T012-03 Configurar contas MQTT por dispositivo e ACL no broker de produção.
-- [ ] T012-04 Estabelecer ponte privada entre Wi-Fi das placas e broker no servidor.
+- [x] T012-03 Configurar contas MQTT por dispositivo e ACL no broker de produção. Evidência: Coolify redeploy concluído em 10/11/2026, `CONNACK_OK` para `esp32-energy` e `esp32-water` pela ponte; publicação MQTT 5 com credencial `esp32-water` no tópico da energia recebeu PUBACK `0x87` (não autorizado).
+- [x] T012-04 Estabelecer ponte privada entre Wi-Fi das placas e broker no servidor. Evidência: conta SSH `cv_mqtt_bridge` com `PermitOpen 127.0.0.1:1883`, listener local `192.168.1.5:1883` e regra do Firewall restrita a `192.168.1.0/24`. Ponte depende deste PC ligado e do IP local atual.
 - [ ] T012-05 Gravar as duas placas e confirmar status/telemetria no banco e no dashboard.
