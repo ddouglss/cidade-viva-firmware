@@ -122,13 +122,34 @@ private:
 
     void loadConfig() {
         Preferences prefs;
-        if (!prefs.begin("cv-network", true)) return;
-        String ssid = prefs.getString("ssid", "");
-        String wifiPassword = prefs.getString("wifiPass", "");
-        String host = prefs.getString("host", "");
-        String user = prefs.getString("user", "");
-        String mqttPassword = prefs.getString("mqttPass", "");
-        prefs.end();
+        String ssid, wifiPassword, host, user, mqttPassword;
+        if (prefs.begin("cv-network", true)) {
+            ssid = prefs.getString("ssid", "");
+            wifiPassword = prefs.getString("wifiPass", "");
+            host = prefs.getString("host", "");
+            user = prefs.getString("user", "");
+            mqttPassword = prefs.getString("mqttPass", "");
+            prefs.end();
+        }
+        if (ssid.isEmpty()) {
+            Preferences legacy;
+            if (legacy.begin("cv-wifi", true)) {
+                String oldSsid = legacy.getString("ssid", "");
+                String oldPassword = legacy.getString("pass", "");
+                legacy.end();
+                if (oldSsid.length() >= 1 && oldSsid.length() <= 32
+                    && (oldPassword.isEmpty() || (oldPassword.length() >= 8 && oldPassword.length() <= 63))) {
+                    ssid = oldSsid;
+                    wifiPassword = oldPassword;
+                    if (prefs.begin("cv-network", false)) {
+                        prefs.putString("ssid", ssid);
+                        prefs.putString("wifiPass", wifiPassword);
+                        prefs.end();
+                    }
+                    Serial.println("CV_WIFI_MIGRATED");
+                }
+            }
+        }
         configured_ = copyField(ssid_, sizeof ssid_, ssid)
             && wifiPassword.length() < sizeof wifiPassword_
             && copyField(host_, sizeof host_, host)
@@ -247,7 +268,7 @@ private:
             fieldCount_ = -1;
             char ssid[33], wifiPass[64], host[48], user[33], mqttPass[65];
             const int offset = rotation_ ? 0 : 2;
-            bool valid = (!rotation_ || configured_)
+            bool valid = (!rotation_ || strlen(ssid_) > 0)
                 && (rotation_ || (copyField(ssid, sizeof ssid, fields_[0])
                     && fields_[1].length() < sizeof wifiPass))
                 && copyField(host, sizeof host, fields_[offset]) && privateIpv4(host)
@@ -269,7 +290,7 @@ private:
             if (configured_) {
                 mqtt_.disconnect();
                 mqtt_.setHost(host_, 1883);
-                if (!rotation_) startWifi();
+                if (!rotation_ || WiFi.status() != WL_CONNECTED) startWifi();
             }
         }
     }
