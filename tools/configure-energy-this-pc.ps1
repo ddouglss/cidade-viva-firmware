@@ -3,9 +3,9 @@ param([string]$Port = 'COM5')
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $python = Join-Path $env:USERPROFILE '.platformio/penv/Scripts/python.exe'
-$secretPath = Join-Path $env:APPDATA 'CidadeViva/mqtt-energy.dpapi'
+$secretPath = Join-Path $env:USERPROFILE 'AppData/Roaming/CidadeViva/mqtt-energy.dpapi'
 if (-not (Test-Path -LiteralPath $python)) { throw 'Python do PlatformIO nao encontrado.' }
-if (-not (Test-Path -LiteralPath $secretPath)) { throw 'Senha MQTT local nao encontrada.' }
+if (-not (Test-Path -LiteralPath $secretPath)) { throw "Senha MQTT local nao encontrada em $secretPath. Execute como o usuario ddoug, sem elevacao." }
 
 Write-Host 'Configure a placa de energia com o Wi-Fi 2.4 GHz usado neste PC.'
 $env:CV_WIFI_SSID = Read-Host 'Nome exato da rede (SSID)'
