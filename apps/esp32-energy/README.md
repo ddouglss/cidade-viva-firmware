@@ -77,6 +77,26 @@ Para parar o teste, desconectar USB; para voltar à imagem sem GPIO, gravar o
 ambiente energy-disabled conforme comando anterior. A serial reporta pedido de
 nível, não medição de luz. Arquivo de entrada: firmware/led26_main.cpp.
 
+## Perfil de telemetria MQTT (sem saídas físicas)
+
+`energy-telemetry` publica status/LWT e telemetria MQTT v1. Não mede lux,
+energia ou iluminação física e mantém todas as saídas desabilitadas. O broker
+deve ser acessível por um endereço IPv4 privado da rede local/VPN. O perfil não
+abre ponto de acesso de configuração. Configure via USB com
+`tools/configure-private-mqtt.py` após o upload; não grave senhas em arquivos ou
+na linha de comando. Veja [SDD 012](../../docs/sdd/012-mqtt-telemetry/spec.md).
+
+```powershell
+./tools/pio.ps1 run --project-dir apps/esp32-energy -e energy-telemetry
+# Após confirmar que esta é a placa de energia e fechar o monitor serial:
+./tools/pio.ps1 run --project-dir apps/esp32-energy -e energy-telemetry -t upload --upload-port COM5
+& "$env:USERPROFILE/.platformio/penv/Scripts/python.exe" ./tools/configure-private-mqtt.py --port COM5 --device-id esp32-energy --broker-ip 192.168.1.10
+```
+
+Substitua `COM5` e o IP de exemplo pelos valores reais. A imagem antiga da placa
+é substituída ao gravar. Ainda faltam gateway privado, credencial por dispositivo
+no broker e teste físico ponta a ponta.
+
 ## Teste de bancada Wi-Fi
 
 O perfil `energy-wifi-test` mantém as saídas de aplicação desabilitadas e

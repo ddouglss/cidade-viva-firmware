@@ -121,6 +121,25 @@ Perfil padrão ainda é water-disabled. Habilitar potência exige especificar e
 validar fonte/corrente, acionamento/proteção do motor e GPIO real antes de trocar
 o DisabledPumpDriver. Nenhuma confirmação de vazão é inferida do software.
 
+## Perfil de telemetria MQTT (bomba desabilitada)
+
+`water-telemetry` publica status/LWT, ADC bruto G34 e estado conhecido da boia
+G27 pelo contrato v1. Não publica percentual de umidade sem calibração; `pumpOn`
+permanece `false`, sem GPIO de bomba. O broker precisa de IP privado alcançável
+via rede local/VPN. Configure SSID e credenciais MQTT por USB, nunca no Git.
+Veja [SDD 012](../../docs/sdd/012-mqtt-telemetry/spec.md).
+
+```powershell
+./tools/pio.ps1 run --project-dir apps/esp32-water -e water-telemetry
+# Após confirmar que esta é a placa da água e fechar o monitor serial:
+./tools/pio.ps1 run --project-dir apps/esp32-water -e water-telemetry -t upload --upload-port COM5
+& "$env:USERPROFILE/.platformio/penv/Scripts/python.exe" ./tools/configure-private-mqtt.py --port COM5 --device-id esp32-water --broker-ip 192.168.1.10
+```
+
+Substitua `COM5` e o IP de exemplo. Gravar substitui a imagem atual. Somente os
+GPIO de entrada G27/G34 já testados são usados; gateway privado e validação
+física ponta a ponta permanecem pendentes.
+
 ## Teste de bancada Wi-Fi
 
 Conecte somente a unidade da água por USB e confirme a porta. Os comandos
