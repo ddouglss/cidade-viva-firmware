@@ -20,11 +20,12 @@ public:
         loadConfig();
         loadApPassword();
         WiFi.persistent(false);
-        WiFi.mode(WIFI_STA);
+        WiFi.mode(WIFI_AP_STA);
         mqtt_.setOptions(15, true, 1000);
         mqtt_.begin(net_);
         if (configured_) mqtt_.setHost(host_, 1883);
         if (configured_) startWifi();
+        startAp();
     }
 
     void tick(uint32_t now, const String& measurements, const String& actuators,
@@ -35,13 +36,9 @@ public:
         if (!configured_) return;
         if (WiFi.status() != WL_CONNECTED) {
             ntpStarted_ = false;
-            if (wifiLostAt_ == 0) wifiLostAt_ = now;
-            if (uint32_t(now - wifiLostAt_) >= 30000u) startAp();
             if (uint32_t(now - lastWifiAttempt_) >= 10000u) startWifi();
             return;
         }
-        wifiLostAt_ = 0;
-        if (apActive_) stopAp();
         if (!ntpStarted_) { configTime(0, 0, "pool.ntp.org"); ntpStarted_ = true; }
         if (!mqtt_.connected()) {
             if (uint32_t(now - lastMqttAttempt_) < 5000u) return;
@@ -91,7 +88,6 @@ private:
     uint32_t lastMqttAttempt_ = 0;
     uint32_t lastStatusAt_ = 0;
     uint32_t lastTelemetryAt_ = 0;
-    uint32_t wifiLostAt_ = 0;
     uint32_t pendingAt_ = 0;
     bool apActive_ = false;
     bool pendingWifi_ = false;
@@ -222,13 +218,6 @@ private:
         Serial.printf("CV_AP_READY ssid=%s ip=%s\n", apName.c_str(), WiFi.softAPIP().toString().c_str());
     }
 
-    void stopAp() {
-        http_.stop();
-        WiFi.softAPdisconnect(true);
-        WiFi.mode(WIFI_STA);
-        apActive_ = false;
-    }
-
     void applyPendingWifi() {
         pendingWifi_ = false;
         Preferences prefs;
@@ -242,7 +231,6 @@ private:
         mqtt_.disconnect();
         mqtt_.setHost(host_, 1883);
         WiFi.disconnect();
-        wifiLostAt_ = millis();
         startWifi();
     }
 

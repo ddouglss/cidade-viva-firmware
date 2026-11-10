@@ -3,9 +3,9 @@
 Dois firmwares independentes em C++/PlatformIO para ESP32 D1 R32 (placas a confirmar), com contratos MQTT v1 compartilhados (`docs/shared/02-CONTRATOS-MQTT-V1.md`). O circuito solar e a distribuição de energia exigem validação de engenharia própria (`docs/eletrica_e_solar/SEGURANCA-E-DIMENSIONAMENTO.md`).
 
 ## Troca de Wi-Fi após instalar na maquete
-Os perfis `energy-telemetry` e `water-telemetry` preservam Wi-Fi/MQTT em NVS. Se o Wi-Fi ficar indisponível por 30 segundos, a placa abre `CidadeViva-Energy` ou `CidadeViva-Water` com senha WPA2 individual gerada no primeiro boot. Registre essa senha **antes** da instalação; ela é exibida somente pela serial USB como `CV_AP_PASSWORD` e não deve ser enviada por capturas de tela ou commit.
+Os perfis `energy-telemetry` e `water-telemetry` preservam Wi-Fi/MQTT em NVS. Enquanto a placa estiver ligada, ela mantém `CidadeViva-Energy` ou `CidadeViva-Water` com senha WPA2 individual gerada no primeiro boot, mesmo quando conectada à rede normal. Registre essa senha **antes** da instalação; ela é exibida somente pela serial USB como `CV_AP_PASSWORD` e não deve ser enviada por capturas de tela ou commit.
 
-Conecte o notebook/celular à rede da placa, abra `http://192.168.4.1` e informe SSID, senha Wi-Fi de 2,4 GHz e IPv4 privado do notebook que executa a ponte MQTT. A credencial MQTT permanece gravada. O portal fecha quando a placa volta a conectar. A página hospedada em produção não acessa as portas COM locais. Redes com portal cativo ou isolamento entre clientes podem impedir a conexão; para demonstração, prefira um hotspot 2,4 GHz controlado por você.
+Conecte o notebook/celular à rede da placa, abra `http://192.168.4.1` e informe SSID, senha Wi-Fi de 2,4 GHz e IPv4 privado do notebook que executa a ponte MQTT. A credencial MQTT permanece gravada. A página hospedada em produção não acessa as portas COM locais. Redes com portal cativo ou isolamento entre clientes podem impedir a conexão; para demonstração, prefira um hotspot 2,4 GHz controlado por você.
 
 ## Fluxo de trabalho
 1. Simular os dois firmwares e construir clientes MQTT antes de receber as placas.
