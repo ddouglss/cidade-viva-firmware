@@ -3,6 +3,7 @@
 import argparse
 import getpass
 import ipaddress
+import os
 import sys
 import time
 
@@ -14,6 +15,7 @@ def main() -> int:
     parser.add_argument("--port", required=True, help="Serial port of the selected board, e.g. COM5")
     parser.add_argument("--device-id", choices=("esp32-energy", "esp32-water"), required=True)
     parser.add_argument("--broker-ip", required=True, help="Private IPv4 of the local VPN gateway")
+    parser.add_argument("--from-env", action="store_true", help="Read credentials from short-lived environment variables")
     args = parser.parse_args()
     address = ipaddress.ip_address(args.broker_ip)
     private_lan = any(address in ipaddress.ip_network(block) for block in (
@@ -21,9 +23,14 @@ def main() -> int:
     if address.version != 4 or not private_lan:
         parser.error("broker-ip must be a reachable private LAN IPv4 address")
 
-    ssid = input("Wi-Fi 2.4 GHz SSID: ")
-    wifi_password = getpass.getpass("Wi-Fi password: ")
-    mqtt_password = getpass.getpass(f"MQTT password for {args.device_id}: ")
+    if args.from_env:
+        ssid = os.environ.pop("CV_WIFI_SSID", "")
+        wifi_password = os.environ.pop("CV_WIFI_PASSWORD", "")
+        mqtt_password = os.environ.pop("CV_MQTT_PASSWORD", "")
+    else:
+        ssid = input("Wi-Fi 2.4 GHz SSID: ")
+        wifi_password = getpass.getpass("Wi-Fi password: ")
+        mqtt_password = getpass.getpass(f"MQTT password for {args.device_id}: ")
     if not 1 <= len(ssid.encode()) <= 32 or "\n" in ssid or "\r" in ssid:
         parser.error("SSID must be 1-32 bytes without newline")
     if len(wifi_password.encode()) >= 64 or "\n" in wifi_password or "\r" in wifi_password:
